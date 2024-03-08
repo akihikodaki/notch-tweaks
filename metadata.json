@@ -1,0 +1,10 @@
+{
+    "description": "Tweaks for devices with notches",
+    "donations": {"github": "https://github.com/sponsors/akihikodaki"},
+    "name": "Notch Tweaks",
+    "session-modes": ["gdm", "unlock-dialog", "user"],
+    "shell-version": [ "45" ],
+    "url": "https://github.com/akihikodaki/notch-tweaks",
+    "uuid": "notch-tweaks@akihikodaki.github.io",
+    "version": 1
+}
