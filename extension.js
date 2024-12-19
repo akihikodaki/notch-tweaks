@@ -1,17 +1,24 @@
 // SPDX-License-Identifier: 0BSD
 
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
-import {panel, sessionMode} from 'resource:///org/gnome/shell/ui/main.js';
+import {layoutManager, panel, sessionMode} from 'resource:///org/gnome/shell/ui/main.js';
 
 export default class extends Extension {
+    #oldHeight;
+    #connection;
+
     enable() {
         const {emit} = sessionMode;
+        const {height} = panel;
 
-        this._oldHeight = panel.height;
+        function updateHeight() {
+            const {geometry_scale} = layoutManager.findMonitorForActor(panel);
+            panel.height = Math.max(height, 58 / geometry_scale);
+        };
 
-        if (panel.height < 58) {
-            panel.height = 58;
-        }
+        this.#oldHeight = height;
+        this.#connection = layoutManager.connect('monitors-changed', updateHeight);
+        updateHeight();
 
         sessionMode.emit = function() {
             this.panel = {
@@ -27,8 +34,8 @@ export default class extends Extension {
     }
 
     disable() {
-        panel.height = this._oldHeight;
-
+        panel.height = this.#oldHeight;
+        layoutManager.disconnect(this.#connection);
         delete sessionMode.emit;
         sessionMode._sync();
     }
