@@ -11,6 +11,14 @@ export default class extends Extension {
         const {emit} = sessionMode;
         const {height} = panel;
 
+        function patchPanel(sessionMode) {
+            sessionMode.panel = {
+                ...sessionMode.panel,
+                left: sessionMode.panel.left.concat(sessionMode.panel.center),
+                center: []
+            };
+        }
+
         function updateHeight() {
             const {geometry_scale} = layoutManager.findMonitorForActor(panel);
             panel.height = Math.max(height, 58 / geometry_scale);
@@ -21,16 +29,12 @@ export default class extends Extension {
         updateHeight();
 
         sessionMode.emit = function() {
-            this.panel = {
-                ...this.panel,
-                left: this.panel.left.concat(this.panel.center),
-                center: []
-            };
-
+            patchPanel(this);
             emit.apply(this, arguments);
         };
 
-        sessionMode.emit('updated');
+        patchPanel(sessionMode);
+        panel._updatePanel();
     }
 
     disable() {
